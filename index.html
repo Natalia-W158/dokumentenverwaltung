@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dokumentenbasis Feuerwehrrecht</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #b3261e; --red-dark: #8f1d17; --red-soft: #fdecea;
+    --ink: #1a1d21; --muted: #5b626b; --line: #d9dde3; --line-soft: #e8ebef;
+    --bg: #f3f4f6; --card: #ffffff; --head: #eef0f3; --ok: #1f7a3f; --ok-soft: #e6f4ea;
+    --radius: 8px; --shadow: 0 8px 24px rgba(20, 24, 31, .12);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "IBM Plex Sans", system-ui, sans-serif; color: var(--ink); background: var(--bg); font-size: 16px; }
+  button { font: inherit; cursor: pointer; }
+
+  header { background: var(--card); border-bottom: 1px solid var(--line); }
+  .bar { max-width: 1240px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+  .logo { width: 30px; height: 30px; border-radius: 6px; background: var(--red); flex: none; }
+  .brand { font-weight: 600; font-size: 17px; }
+  .spacer { flex: 1; }
+  .user { color: var(--muted); font-size: 15px; }
+  .btn { border-radius: var(--radius); padding: 10px 20px; font-weight: 600; border: 1px solid var(--ink); background: var(--card); color: var(--ink); }
+  .btn:hover { background: var(--bg); }
+  .btn-primary { background: var(--red); border-color: var(--red); color: #fff; font-size: 17px; padding: 0 24px; height: 48px; white-space: nowrap; }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+  .btn-outline-red { border-color: var(--red); color: var(--red); padding: 9px 32px; }
+  .btn-outline-red:hover { background: var(--red-soft); }
+  .btn-ghost { border: none; background: none; color: var(--muted); padding: 6px 8px; }
+  .btn-ghost:hover { color: var(--ink); background: none; }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 40px 24px 48px; }
+  h1 { font-size: 34px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lead { color: var(--muted); margin: 0 0 32px; font-size: 17px; }
+  label.field { display: block; font-weight: 600; font-size: 15px; margin-bottom: 8px; }
+
+  .toolbar { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px; }
+  .search { position: relative; flex: 1; }
+  .search input { width: 100%; height: 48px; padding: 0 16px; font: inherit; font-size: 17px; border: 1px solid #8a9099; border-radius: var(--radius); background: var(--card); color: var(--ink); }
+  .search input:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: var(--red); }
+  .suggest { position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 6px); background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); max-height: 360px; overflow: auto; padding: 6px; display: none; }
+  .suggest.open { display: block; }
+  .opt { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 10px 12px; border-radius: 6px; cursor: pointer; }
+  .opt[aria-selected="true"], .opt:hover { background: var(--bg); }
+  .opt .n { font-weight: 600; }
+  .opt .d { color: var(--muted); font-size: 14px; grid-column: 1; }
+  .opt .v { color: var(--muted); font-size: 14px; grid-row: 1; grid-column: 2; font-variant-numeric: tabular-nums; }
+  .opt .tag { grid-column: 2; grid-row: 2; font-size: 12px; color: var(--ok); text-align: right; }
+  .opt mark { background: #fff1b8; color: inherit; border-radius: 2px; }
+  .suggest .empty { padding: 12px; color: var(--muted); }
+  .suggest .all { border-top: 1px solid var(--line-soft); margin-top: 4px; padding: 10px 12px; color: var(--red); font-weight: 600; cursor: pointer; border-radius: 6px; }
+  .suggest .all:hover { background: var(--red-soft); }
+
+  .table-wrap { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .scroll { max-height: 640px; overflow: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { position: sticky; top: 0; background: var(--head); text-align: left; font-size: 15px; font-weight: 600; color: #3b4148; padding: 16px 24px; border-bottom: 1px solid var(--line); }
+  tbody td { padding: 18px 24px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.flash td { animation: flash 1.6s ease-out; }
+  @keyframes flash { from { background: #fff6d6; } to { background: transparent; } }
+  td.name { font-weight: 600; width: 28%; }
+  td.desc { color: var(--muted); }
+  td.date { white-space: nowrap; font-variant-numeric: tabular-nums; width: 14%; }
+  td.act { text-align: right; width: 1%; }
+  .vid { display: block; font-weight: 400; color: var(--muted); font-size: 12px; font-family: ui-monospace, monospace; margin-top: 4px; }
+  .status { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-left: 8px; vertical-align: middle; }
+  .status.processing { background: #fff4d6; color: #7a5600; }
+  .status.done { background: var(--ok-soft); color: var(--ok); }
+  .status.error { background: var(--red-soft); color: var(--red); }
+  .empty-state { padding: 48px 24px; text-align: center; color: var(--muted); }
+  .empty-state strong { display: block; color: var(--ink); margin-bottom: 4px; }
+  .foot { margin-top: 14px; color: var(--muted); font-size: 15px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+  /* Dialoge */
+  dialog { border: none; border-radius: 12px; padding: 0; width: min(560px, calc(100vw - 32px)); box-shadow: var(--shadow); color: var(--ink); }
+  dialog::backdrop { background: rgba(20, 24, 31, .45); }
+  .dlg-head { padding: 20px 24px 0; display: flex; align-items: center; }
+  .dlg-head h2 { margin: 0; font-size: 22px; flex: 1; }
+  .dlg-body { padding: 20px 24px; display: grid; gap: 16px; }
+  .dlg-foot { padding: 16px 24px 20px; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--line-soft); }
+  .dlg-foot .btn-primary { height: 44px; font-size: 16px; }
+  .inp { width: 100%; padding: 10px 12px; font: inherit; border: 1px solid #8a9099; border-radius: var(--radius); background: #fff; color: var(--ink); }
+  .inp:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: var(--red); }
+  textarea.inp { min-height: 76px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .drop { border: 2px dashed #b4bac2; border-radius: 10px; padding: 26px 16px; text-align: center; color: var(--muted); cursor: pointer; transition: .15s; }
+  .drop:hover, .drop.over { border-color: var(--red); background: var(--red-soft); color: var(--ink); }
+  .drop strong { color: var(--red); }
+  .file-chip { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); }
+  .file-chip .fn { font-weight: 600; word-break: break-all; }
+  .file-chip .fs { color: var(--muted); font-size: 14px; }
+  .meta { font-size: 13px; color: var(--muted); font-family: ui-monospace, monospace; }
+  .progress { height: 6px; background: var(--line-soft); border-radius: 99px; overflow: hidden; }
+  .progress > i { display: block; height: 100%; width: 0; background: var(--red); transition: width .2s; }
+  .msg { padding: 12px 14px; border-radius: var(--radius); font-size: 15px; }
+  .msg.err { background: var(--red-soft); color: var(--red-dark); }
+  .msg.ok { background: var(--ok-soft); color: var(--ok); }
+  .hint { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .hidden { display: none !important; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 12px 18px; border-radius: var(--radius); box-shadow: var(--shadow); font-size: 15px; z-index: 50; display: flex; gap: 14px; align-items: center; }
+  .toast button { background: none; border: none; color: #ffb4ab; font-weight: 600; padding: 0; }
+
+  @media (max-width: 760px) {
+    .bar { padding: 12px 16px; } .brand { font-size: 15px; } .user { display: none; }
+    main { padding: 28px 16px 40px; } h1 { font-size: 28px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .row2 { grid-template-columns: 1fr; }
+    thead { display: none; }
+    tbody tr { display: grid; grid-template-columns: 1fr auto; padding: 14px 16px; border-bottom: 1px solid var(--line-soft); gap: 4px 12px; }
+    tbody td { padding: 0; border: none; width: auto !important; }
+    td.name { grid-column: 1; } td.date { grid-column: 1; color: var(--muted); font-size: 14px; }
+    td.desc { grid-column: 1; font-size: 15px; }
+    td.act { grid-column: 2; grid-row: 1 / span 3; align-self: center; }
+    .btn-outline-red { padding: 8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <div class="logo" aria-hidden="true"></div>
+    <div class="brand">Dokumentenbasis Feuerwehrrecht</div>
+    <div class="spacer"></div>
+    <span class="user" id="userEmail">[E-Mail des Users]</span>
+    <button class="btn-ghost" id="openSettings" title="Webhook-Einstellungen" aria-label="Einstellungen">⚙︎</button>
+    <button class="btn" id="logout">Abmelden</button>
+  </div>
+</header>
+
+<main>
+  <h1>Dokumentenbasis</h1>
+  <p class="lead">Alle Dokumente und Versionen, auf die das Recherche-Tool zugreift.</p>
+
+  <label class="field" for="q">Suche in Name und Beschreibung</label>
+  <div class="toolbar">
+    <div class="search">
+      <input id="q" type="search" autocomplete="off" placeholder="Begriff eingeben, um die Liste zu filtern"
+             role="combobox" aria-expanded="false" aria-controls="suggest" aria-autocomplete="list">
+      <div class="suggest" id="suggest" role="listbox"></div>
+    </div>
+    <button class="btn btn-primary" id="openUpload">Dokument hinzufügen</button>
+  </div>
+
+  <div class="table-wrap">
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Dokumentenname</th><th>Beschreibung</th><th>Versionsdatum</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="foot">
+    <span id="count"></span>
+    <button class="btn-ghost" id="showAll">Alle Dokumente anzeigen</button>
+  </div>
+</main>
+
+<!-- Upload-Dialog -->
+<dialog id="uploadDlg">
+  <form id="uploadForm" method="dialog">
+    <div class="dlg-head"><h2>Dokument hinzufügen</h2><button type="button" class="btn-ghost" data-close aria-label="Schließen">✕</button></div>
+    <div class="dlg-body">
+      <div id="drop" class="drop" tabindex="0">
+        <strong>Datei auswählen</strong> oder hierher ziehen<br>
+        <span style="font-size:14px">PDF, DOCX, TXT – max. 50 MB</span>
+      </div>
+      <input id="file" type="file" class="hidden" accept=".pdf,.doc,.docx,.txt,.md,.rtf,.odt">
+      <div id="fileChip" class="file-chip hidden">
+        <div style="flex:1"><div class="fn" id="fileName"></div><div class="fs" id="fileSize"></div></div>
+        <button type="button" class="btn-ghost" id="changeFile">Ändern</button>
+      </div>
+      <div>
+        <label class="field" for="docName">Dokumentenname</label>
+        <input class="inp" id="docName" required list="knownNames">
+        <datalist id="knownNames"></datalist>
+        <div class="hint">Gleicher Name wie ein bestehendes Dokument = neue Version dieses Dokuments.</div>
+      </div>
+      <div>
+        <label class="field" for="docDesc">Beschreibung</label>
+        <textarea class="inp" id="docDesc"></textarea>
+      </div>
+      <div class="row2">
+        <div>
+          <label class="field" for="docDate">Versionsdatum</label>
+          <input class="inp" id="docDate" type="date" required>
+        </div>
+        <div>
+          <label class="field">Versions-ID</label>
+          <div class="meta" id="versionId" style="padding-top:10px"></div>
+        </div>
+      </div>
+      <div id="progressWrap" class="hidden"><div class="progress"><i id="bar"></i></div><div class="hint" id="progressText"></div></div>
+      <div id="uploadMsg" class="msg hidden"></div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn" data-close>Abbrechen</button>
+      <button type="submit" class="btn btn-primary" id="submitUpload" disabled>Hochladen</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Entfernen bestätigen -->
+<dialog id="confirmDlg">
+  <div class="dlg-head"><h2>Dokument entfernen?</h2></div>
+  <div class="dlg-body"><p style="margin:0" id="confirmText"></p></div>
+  <div class="dlg-foot">
+    <button class="btn" data-close>Abbrechen</button>
+    <button class="btn btn-primary" id="confirmRemove">Entfernen</button>
+  </div>
+</dialog>
+
+<!-- Einstellungen -->
+<dialog id="settingsDlg">
+  <form id="settingsForm" method="dialog">
+    <div class="dlg-head"><h2>Einstellungen</h2><button type="button" class="btn-ghost" data-close aria-label="Schließen">✕</button></div>
+    <div class="dlg-body">
+      <div>
+        <label class="field" for="setUpload">Upload-Webhook (POST, multipart/form-data)</label>
+        <input class="inp" id="setUpload" type="url" placeholder="https://…/webhook/dokument-upload">
+        <div class="hint">Leer lassen = Demo-Modus (Upload wird nur simuliert).</div>
+      </div>
+      <div>
+        <label class="field" for="setDelete">Entfernen-Webhook (optional, POST JSON)</label>
+        <input class="inp" id="setDelete" type="url" placeholder="https://…/webhook/dokument-entfernen">
+      </div>
+      <div>
+        <label class="field" for="setList">Dokumentenliste (optional, GET JSON)</label>
+        <input class="inp" id="setList" type="url" placeholder="https://…/webhook/dokumente">
+        <div class="hint">Erwartet ein Array mit versions_id, dokumentenname, beschreibung, versionsdatum.</div>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn" data-close>Abbrechen</button>
+      <button type="submit" class="btn btn-primary">Speichern</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ------------------------------------------------------------------
+   Konfiguration – hier die Webhook-URLs der Automation eintragen.
+   (Über ⚙︎ im Header lassen sie sich zum Testen auch im Browser setzen.)
+------------------------------------------------------------------- */
+const CONFIG = {
+  UPLOAD_WEBHOOK_URL: "",   // z. B. https://n8n.example.de/webhook/dokument-upload
+  DELETE_WEBHOOK_URL: "",
+  LIST_URL: "",
+  MAX_FILE_MB: 50,
+};
+
+const SAMPLE = [
+  { versions_id: "v-fwg-2024", dokumentenname: "Feuerwehrgesetz", beschreibung: "Landesgesetz zu Aufgaben und Organisation der Feuerwehren", versionsdatum: "2024-01-01" },
+  { versions_id: "v-fwg-2021", dokumentenname: "Feuerwehrgesetz", beschreibung: "Landesgesetz zu Aufgaben und Organisation der Feuerwehren", versionsdatum: "2021-01-01" },
+  { versions_id: "v-fwdv1-2023", dokumentenname: "Feuerwehr-Dienstvorschrift 1", beschreibung: "Grundtätigkeiten im Lösch- und Hilfeleistungseinsatz", versionsdatum: "2023-03-15" },
+  { versions_id: "v-vfa-2022", dokumentenname: "Verordnung über Feuerwehrangehörige", beschreibung: "Ausbildung, Laufbahn und Befähigung von Einsatzkräften", versionsdatum: "2022-07-01" },
+  { versions_id: "v-sat-2020", dokumentenname: "Satzung des Verbands", beschreibung: "Vereinsrechtliche Grundlagen", versionsdatum: "2020-05-10" },
+  { versions_id: "v-bsv-2019", dokumentenname: "Brandschutzverordnung", beschreibung: "Anforderungen an den vorbeugenden Brandschutz", versionsdatum: "2019-09-01" },
+];
+
+/* ---------- Speicher (robust gegen blockierten localStorage) ---------- */
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const settings = Object.assign({}, CONFIG, store.get("dkb.settings", {}));
+
+let catalog = store.get("dkb.catalog", null) || SAMPLE.slice();     // alle bekannten Versionen
+let shown = store.get("dkb.shown", null) || catalog.map(d => d.versions_id); // angezeigte Versionen
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtDate = iso => { if (!iso) return "–"; const [y, m, d] = iso.slice(0, 10).split("-"); return d && m ? `${d}.${m}.${y}` : iso; };
+const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const byDate = (a, b) => a.dokumentenname.localeCompare(b.dokumentenname, "de") || b.versionsdatum.localeCompare(a.versionsdatum);
+const save = () => { store.set("dkb.catalog", catalog); store.set("dkb.shown", shown); };
+const newVersionId = () => (crypto.randomUUID ? crypto.randomUUID() : "v-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8));
+
+/* ---------- Tabelle ---------- */
+function render(flashId) {
+  const list = shown.map(id => catalog.find(d => d.versions_id === id)).filter(Boolean).sort(byDate);
+  const rows = $("#rows");
+  if (!list.length) {
+    rows.innerHTML = `<tr><td colspan="4" class="empty-state"><strong>Keine Dokumente in der Liste</strong>Begriff im Suchfeld eingeben und einen Vorschlag auswählen – oder ein neues Dokument hinzufügen.</td></tr>`;
+  } else {
+    rows.innerHTML = list.map(d => `
+      <tr data-id="${esc(d.versions_id)}" class="${d.versions_id === flashId ? "flash" : ""}">
+        <td class="name">${esc(d.dokumentenname)}${d.status ? `<span class="status ${d.status}">${{ processing: "Wird verarbeitet", done: "Neu", error: "Fehler" }[d.status]}</span>` : ""}
+          <span class="vid" title="versions_id">${esc(d.versions_id)}</span></td>
+        <td class="desc">${esc(d.beschreibung)}</td>
+        <td class="date">${fmtDate(d.versionsdatum)}</td>
+        <td class="act"><button class="btn btn-outline-red" data-remove="${esc(d.versions_id)}">Entfernen</button></td>
+      </tr>`).join("");
+  }
+  $("#count").textContent = `${list.length} ${list.length === 1 ? "Eintrag" : "Einträge"}, eine Zeile pro Version.` +
+    (settings.LIST_URL ? "" : " Beispieldaten.");
+  $("#showAll").classList.toggle("hidden", list.length === catalog.length);
+  $("#knownNames").innerHTML = [...new Set(catalog.map(d => d.dokumentenname))].map(n => `<option value="${esc(n)}">`).join("");
+  if (flashId) document.querySelector(`tr[data-id="${CSS.escape(flashId)}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+}
+
+function addToList(id) {
+  if (!shown.includes(id)) shown.push(id);
+  save(); render(id);
+}
+
+/* ---------- Suche mit Vorschlägen ---------- */
+const q = $("#q"), sug = $("#suggest");
+let active = -1, matches = [];
+
+function highlight(text, term) {
+  if (!term) return esc(text);
+  const i = norm(text).indexOf(norm(term));
+  if (i < 0) return esc(text);
+  return esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + term.length)) + "</mark>" + esc(text.slice(i + term.length));
+}
+
+function openSuggest() {
+  const term = q.value.trim();
+  if (!term) return closeSuggest();
+  const t = norm(term);
+  matches = catalog.filter(d => norm(d.dokumentenname + " " + d.beschreibung).includes(t)).sort((a, b) => {
+    const as = norm(a.dokumentenname).startsWith(t), bs = norm(b.dokumentenname).startsWith(t);
+    return (bs - as) || byDate(a, b);
+  }).slice(0, 12);
+  active = matches.length ? 0 : -1;
+  sug.innerHTML = matches.length
+    ? matches.map((d, i) => `
+        <div class="opt" role="option" id="opt${i}" data-i="${i}" aria-selected="${i === active}">
+          <span class="n">${highlight(d.dokumentenname, term)}</span>
+          <span class="v">Version ${fmtDate(d.versionsdatum)}</span>
+          <span class="d">${highlight(d.beschreibung, term)}</span>
+          ${shown.includes(d.versions_id) ? `<span class="tag">✓ in Liste</span>` : ""}
+        </div>`).join("") + (matches.length > 1 ? `<div class="all" data-all>Alle ${matches.length} Treffer übernehmen</div>` : "")
+    : `<div class="empty">Kein Dokument gefunden für „${esc(term)}“.</div>`;
+  sug.classList.add("open"); q.setAttribute("aria-expanded", "true");
+}
+function closeSuggest() { sug.classList.remove("open"); q.setAttribute("aria-expanded", "false"); active = -1; }
+function setActive(i) {
+  active = (i + matches.length) % matches.length;
+  sug.querySelectorAll(".opt").forEach((el, j) => el.setAttribute("aria-selected", j === active));
+  sug.querySelector(`#opt${active}`)?.scrollIntoView({ block: "nearest" });
+  q.setAttribute("aria-activedescendant", "opt" + active);
+}
+function pick(i) { const d = matches[i]; if (!d) return; q.value = ""; closeSuggest(); addToList(d.versions_id); }
+
+q.addEventListener("input", openSuggest);
+q.addEventListener("focus", openSuggest);
+q.addEventListener("keydown", e => {
+  if (!sug.classList.contains("open") || !matches.length) return;
+  if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active - 1); }
+  else if (e.key === "Enter") { e.preventDefault(); pick(active); }
+  else if (e.key === "Escape") closeSuggest();
+});
+sug.addEventListener("mousedown", e => {
+  e.preventDefault();
+  if (e.target.closest("[data-all]")) { matches.forEach(d => shown.includes(d.versions_id) || shown.push(d.versions_id)); q.value = ""; closeSuggest(); save(); render(); return; }
+  const o = e.target.closest(".opt"); if (o) pick(+o.dataset.i);
+});
+document.addEventListener("click", e => { if (!e.target.closest(".search")) closeSuggest(); });
+
+$("#showAll").addEventListener("click", () => { shown = catalog.map(d => d.versions_id); save(); render(); });
+
+/* ---------- Entfernen ---------- */
+let pendingRemove = null;
+$("#rows").addEventListener("click", e => {
+  const id = e.target.closest("[data-remove]")?.dataset.remove; if (!id) return;
+  const d = catalog.find(x => x.versions_id === id);
+  pendingRemove = d;
+  $("#confirmText").innerHTML = `<strong>${esc(d.dokumentenname)}</strong> (Version ${fmtDate(d.versionsdatum)}) wird aus der Liste entfernt.` +
+    (settings.DELETE_WEBHOOK_URL ? " Die Automation wird informiert und entfernt die Version aus der Dokumentenbasis." : "");
+  $("#confirmDlg").showModal();
+});
+$("#confirmRemove").addEventListener("click", async () => {
+  const d = pendingRemove; $("#confirmDlg").close(); if (!d) return;
+  if (settings.DELETE_WEBHOOK_URL) {
+    try {
+      const r = await fetch(settings.DELETE_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", versions_id: d.versions_id, dokumentenname: d.dokumentenname }) });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      catalog = catalog.filter(x => x.versions_id !== d.versions_id);
+    } catch (err) { toast("Entfernen fehlgeschlagen: " + err.message); return; }
+  }
+  const before = shown.slice();
+  shown = shown.filter(id => id !== d.versions_id); save(); render();
+  toast(`„${d.dokumentenname}“ entfernt.`, settings.DELETE_WEBHOOK_URL ? null : () => { shown = before; save(); render(d.versions_id); });
+});
+
+/* ---------- Upload ---------- */
+const dlg = $("#uploadDlg"), fileInp = $("#file"), drop = $("#drop");
+let file = null, versionId = null, uploading = false;
+
+function resetUpload() {
+  file = null; fileInp.value = ""; versionId = newVersionId();
+  $("#uploadForm").reset();
+  $("#docDate").value = new Date().toISOString().slice(0, 10);
+  $("#versionId").textContent = versionId;
+  drop.classList.remove("hidden"); $("#fileChip").classList.add("hidden");
+  $("#progressWrap").classList.add("hidden"); $("#uploadMsg").classList.add("hidden");
+  $("#submitUpload").textContent = "Hochladen"; updateSubmit();
+}
+function setFile(f) {
+  if (!f) return;
+  if (f.size > settings.MAX_FILE_MB * 1048576) return showMsg("err", `Die Datei ist größer als ${settings.MAX_FILE_MB} MB.`);
+  file = f;
+  $("#fileName").textContent = f.name; $("#fileSize").textContent = fmtSize(f.size) + (f.type ? " · " + f.type : "");
+  drop.classList.add("hidden"); $("#fileChip").classList.remove("hidden"); $("#uploadMsg").classList.add("hidden");
+  if (!$("#docName").value) $("#docName").value = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ").trim();
+  updateSubmit();
+}
+function updateSubmit() { $("#submitUpload").disabled = uploading || !file || !$("#docName").value.trim() || !$("#docDate").value; }
+function showMsg(kind, text) { const m = $("#uploadMsg"); m.className = "msg " + kind; m.textContent = text; }
+
+$("#openUpload").addEventListener("click", () => { resetUpload(); dlg.showModal(); });
+drop.addEventListener("click", () => fileInp.click());
+drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInp.click(); } });
+$("#changeFile").addEventListener("click", () => fileInp.click());
+fileInp.addEventListener("change", () => setFile(fileInp.files[0]));
+["dragenter", "dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => setFile(e.dataTransfer.files[0]));
+["input", "change"].forEach(ev => $("#uploadForm").addEventListener(ev, updateSubmit));
+// Bekannter Name gewählt → Beschreibung übernehmen
+$("#docName").addEventListener("change", () => {
+  const known = catalog.find(d => d.dokumentenname === $("#docName").value.trim());
+  if (known && !$("#docDesc").value) $("#docDesc").value = known.beschreibung;
+});
+
+function sendUpload(form, onProgress) {
+  if (!settings.UPLOAD_WEBHOOK_URL) {           // Demo-Modus
+    return new Promise(res => { let p = 0; const t = setInterval(() => { p += 0.2; onProgress(Math.min(p, 1)); if (p >= 1) { clearInterval(t); res({ demo: true }); } }, 180); });
+  }
+  return new Promise((res, rej) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", settings.UPLOAD_WEBHOOK_URL);
+    xhr.upload.onprogress = e => e.lengthComputable && onProgress(e.loaded / e.total);
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) { let body = null; try { body = JSON.parse(xhr.responseText); } catch {} res(body || {}); }
+      else rej(new Error(`Server antwortete mit ${xhr.status}`));
+    };
+    xhr.onerror = () => rej(new Error("Netzwerkfehler – Webhook nicht erreichbar (ggf. CORS prüfen)."));
+    xhr.send(form);
+  });
+}
+
+$("#uploadForm").addEventListener("submit", async e => {
+  e.preventDefault(); if (!file) return;
+  const entry = {
+    versions_id: versionId,
+    dokumentenname: $("#docName").value.trim(),
+    beschreibung: $("#docDesc").value.trim(),
+    versionsdatum: $("#docDate").value,
+  };
+  const form = new FormData();
+  form.append("data", file, file.name);           // Binärdatei (n8n: Binary Property "data")
+  Object.entries(entry).forEach(([k, v]) => form.append(k, v));
+  form.append("dateiname", file.name);
+  form.append("mime_type", file.type || "application/octet-stream");
+  form.append("hochgeladen_am", new Date().toISOString());
+  form.append("hochgeladen_von", $("#userEmail").textContent);
+
+  uploading = true; updateSubmit();
+  $("#progressWrap").classList.remove("hidden"); $("#uploadMsg").classList.add("hidden");
+  const setP = p => { $("#bar").style.width = (p * 100).toFixed(0) + "%"; $("#progressText").textContent = p < 1 ? `Wird hochgeladen … ${(p * 100).toFixed(0)} %` : "Übertragen – Automation wird gestartet …"; };
+  setP(0);
+  try {
+    const res = await sendUpload(form, setP);
+    catalog.push({ ...entry, versions_id: res.versions_id || entry.versions_id, status: res.demo ? "done" : "processing" });
+    save(); addToList(res.versions_id || entry.versions_id);
+    showMsg("ok", res.demo
+      ? "Demo-Modus: Upload simuliert. Webhook-URL unter ⚙︎ eintragen, um die Automation zu starten."
+      : `Hochgeladen. Die Automation verarbeitet Version ${entry.versions_id}.`);
+    $("#progressWrap").classList.add("hidden");
+    setTimeout(() => dlg.open && dlg.close(), 1400);
+  } catch (err) {
+    showMsg("err", "Upload fehlgeschlagen: " + err.message);
+  } finally { uploading = false; updateSubmit(); }
+});
+
+/* ---------- Einstellungen ---------- */
+$("#openSettings").addEventListener("click", () => {
+  $("#setUpload").value = settings.UPLOAD_WEBHOOK_URL; $("#setDelete").value = settings.DELETE_WEBHOOK_URL; $("#setList").value = settings.LIST_URL;
+  $("#settingsDlg").showModal();
+});
+$("#settingsForm").addEventListener("submit", e => {
+  e.preventDefault();
+  Object.assign(settings, { UPLOAD_WEBHOOK_URL: $("#setUpload").value.trim(), DELETE_WEBHOOK_URL: $("#setDelete").value.trim(), LIST_URL: $("#setList").value.trim() });
+  store.set("dkb.settings", { UPLOAD_WEBHOOK_URL: settings.UPLOAD_WEBHOOK_URL, DELETE_WEBHOOK_URL: settings.DELETE_WEBHOOK_URL, LIST_URL: settings.LIST_URL });
+  $("#settingsDlg").close(); loadList(); render(); toast("Einstellungen gespeichert.");
+});
+
+/* ---------- Allgemein ---------- */
+document.querySelectorAll("dialog").forEach(d => d.addEventListener("click", e => {
+  if (e.target.closest("[data-close]") && !(d === dlg && uploading)) d.close();
+}));
+dlg.addEventListener("cancel", e => uploading && e.preventDefault());
+$("#logout").addEventListener("click", () => toast("Abmelden ist noch nicht mit einem Login verbunden."));
+
+let toastTimer;
+function toast(text, undo) {
+  document.querySelector(".toast")?.remove(); clearTimeout(toastTimer);
+  const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status");
+  t.innerHTML = `<span>${esc(text)}</span>`;
+  if (undo) { const b = document.createElement("button"); b.textContent = "Rückgängig"; b.onclick = () => { undo(); t.remove(); }; t.append(b); }
+  document.body.append(t); toastTimer = setTimeout(() => t.remove(), 5000);
+}
+
+async function loadList() {
+  if (!settings.LIST_URL) return;
+  try {
+    const r = await fetch(settings.LIST_URL); if (!r.ok) throw new Error("HTTP " + r.status);
+    const data = await r.json(); const arr = Array.isArray(data) ? data : data.items || data.data || [];
+    catalog = arr.map(d => ({ versions_id: String(d.versions_id), dokumentenname: d.dokumentenname || d.name || "", beschreibung: d.beschreibung || d.description || "", versionsdatum: (d.versionsdatum || d.date || "").slice(0, 10) }));
+    shown = shown.filter(id => catalog.some(d => d.versions_id === id));
+    if (!shown.length) shown = catalog.map(d => d.versions_id);
+    save(); render();
+  } catch (err) { toast("Dokumentenliste konnte nicht geladen werden: " + err.message); }
+}
+
+render(); loadList();
+</script>
+</body>
+</html>
